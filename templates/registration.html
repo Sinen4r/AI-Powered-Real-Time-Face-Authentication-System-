@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Complete</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/linearicons/style.css') }}">
+    <style>
+        body {
+            background-color: #accffe;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Linearicons-Free', sans-serif; /* Fallback to sans-serif if Linearicons fails */
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white for contrast */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            font-size: 3em; /* Large heading */
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.5em; /* Larger paragraph text */
+            color: #555;
+            margin-bottom: 20px;
+        }
+        a {
+            font-size: 1.2em;
+            color: #0066cc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #003366;
+        }
+        img {
+            max-width: 300px; /* Adjust size as needed */
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registration Successful</h1>
+        <img src="{{ url_for('static', filename='images/image4.png') }}" alt="Registration Image">
+        <p>Your enrollment has been completed.</p>
+        <a href="{{ url_for('index') }}">Return to Home</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Ignore a folder
+opencvIntznseCourse/
+ss/
+.venv/
+# Ignore specific files
+config.json
+.env
+*.log
+*.pt
+
+# Ignore all __pycache__ folders
+__pycache__/

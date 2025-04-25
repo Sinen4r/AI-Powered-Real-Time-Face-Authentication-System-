@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>ID Card Received: {{ id_card }}</h2>
+    <img id="video-stream" src="{{ url_for('video_feed') }}?enrolment={{ 'true' if enrolment else 'false' }}&name={{ name }}&ci={{ ci }}&group={{ group }}">
+<script>
+    const video = document.getElementById("video-stream");
+
+    fetch("{{ url_for('video_feed') }}?enrolment={{ 'true' if enrolment else 'false' }}&name={{ name }}&ci={{ ci }}&group={{ group }}")
+        .then(response => {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+
+            function read() {
+                reader.read().then(({ done, value }) => {
+                    if (done) {
+                        console.log("Stream ended");
+                        return;
+                    }
+
+                    const text = decoder.decode(value);
+                    if (text.includes("ENROLLMENT_DONE")) {
+                        console.log("Enrollment complete, redirecting...");
+                        window.location.href = "{{ url_for('registration') }}"; 
+                        return;
+                    }
+
+                    read(); // Continue reading
+                }).catch(err => {
+                    console.error("Stream error:", err);
+                });
+            }
+
+            read();
+        })
+        .catch(err => {
+            console.error("Fetch error:", err);
+        });
+</script>
+</body>
+</html>

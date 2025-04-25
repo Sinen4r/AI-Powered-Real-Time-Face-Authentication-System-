@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>ID Card Received: {{ id_card }}</h2>
+    <img id="video-stream" src="{{ url_for('login') }}?ci={{ ci }}">
+    <script>
+        const video = document.getElementById("video-stream");
+    
+        fetch("{{ url_for('login') }}?ci={{ ci }}")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Server responded with status: " + response.status);
+                }
+                const reader = response.body.getReader(); // Fixed: collection -> response
+                const decoder = new TextDecoder("utf-8");
+    
+                function read() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            console.log("Stream ended");
+                            return;
+                        }
+    
+                        const text = decoder.decode(value);
+                        console.log("Received:", text.substring(0, 100)); // Debug
+                        if (text.includes("login_succesuful")) {
+                            console.log("Login successful, redirecting to quiz...");
+                            // Extract welcome message (optional)
+                            const welcomeMatch = text.match(/welcome back (.*?)\n/);
+                            const welcomeMessage = welcomeMatch ? welcomeMatch[1] : "";
+                            window.location.href = "{{ url_for('quiz') }}" + 
+                                (welcomeMessage ? "?message=" + encodeURIComponent(welcomeMessage) : "");
+                            return;
+                        }
+                        if (text.includes("login_failed")) {
+                            console.log("Login failed");
+                            alert("Login failed: Face not recognized or ID does not match.");
+                            window.location.href = "{{ url_for('index') }}"; 
+                            return;
+                        }
+                        if (text.includes("ERROR")) {
+                            console.error("Error from server:", text);
+                            alert("Error: " + text.match(/ERROR:.*?(\n|$)/)[0]);
+                            return;
+                        }
+    
+                        read();
+                    }).catch(err => {
+                        console.error("Stream error:", err);
+                        alert("Stream error: " + err.message);
+                    });
+                }
+    
+                read();
+            })
+            .catch(err => {
+                console.error("Fetch error:", err);
+                alert("Fetch error: " + err.message);
+            });
+    </script>
+</body>
+</html>
