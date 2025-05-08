@@ -48,6 +48,11 @@
                             alert("Error: " + text.match(/ERROR:.*?(\n|$)/)[0]);
                             return;
                         }
+                        if(text.includes("Spoofing_detected")){
+                        alert("Enrollment Failed, You have been reported to the IT department...");
+                        window.location.href = "{{ url_for('login') }}"; 
+                        return;
+                    }
     
                         read();
                     }).catch(err => {

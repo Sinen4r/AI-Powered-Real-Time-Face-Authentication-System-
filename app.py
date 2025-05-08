@@ -7,6 +7,7 @@ import pickle
 from insightface.app import FaceAnalysis
 import faiss
 import numpy as np
+import mediapipe as mp
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -16,6 +17,14 @@ face_app = FaceAnalysis(name='buffalo_l')
 face_app.prepare(ctx_id=0, det_size=(160, 160))
 
 model = YOLO("model.pt")
+
+
+EYE_AR_THRESH = 0.3
+
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1)
+mp_drawing = mp.solutions.drawing_utils
+
 
 if os.path.exists("faces.index"):
     faiss_index = faiss.read_index("faces.index")

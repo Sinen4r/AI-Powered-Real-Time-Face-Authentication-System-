@@ -9,7 +9,7 @@ import pprint
 import os
 import pickle
 from flask import session,render_template
-
+from faceliveness import detect_liveness
 
 
 # def capture_and_process(model, enrolment=False,scale=0.5,faiss_index=None, id_to_info=None,name="", ci="", group=""):
@@ -53,7 +53,7 @@ from flask import session,render_template
 #                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 def capture_and_process(model, enrolment=False, scale=0.5, faiss_index=None, id_to_info=None, name="", ci="", group="",face_app=None):
     cap = cv.VideoCapture(0,cv.CAP_DSHOW)
-    cap.set(cv.CAP_PROP_FPS, 15)  
+    cap.set(cv.CAP_PROP_FPS, 25)  
     cap.set(cv.CAP_PROP_FRAME_WIDTH, 640)  
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
     if not cap.isOpened():
@@ -82,13 +82,16 @@ def capture_and_process(model, enrolment=False, scale=0.5, faiss_index=None, id_
 
                 if conf > 0.5:
                     cv.rectangle(current_frame, (x1, y1), (x2, y2), (129, 200, 500), 2)
-                    cv.putText(current_frame, f"Face {conf:.2f}", (x1, y1 - 10),
+                    cv.putText(current_frame, f"Face {conf:.2f}", (x1-20, y1 - 10),
                             cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-                    if enrolment and conf > 0.8 and count>45:
-                         face_image = current_frame[y1:y2, x1:x2]
-                         add_new_user(name, ci, group, face_image, faiss_index, id_to_info,face_app)
-                         yield "data: ENROLLMENT_DONE\n\n"
-                         return  
+                    cv.putText(current_frame,"Processing the face Stay Still!!",((x1-20),y2+15),cv.FONT_HERSHEY_SIMPLEX,0.6,(191,95,0),2)
+                    
+                    if enrolment and conf > 00.99 and count>50 :
+                            face_image = current_frame[y1:y2, x1:x2]
+                            add_new_user(name, ci, group, face_image, faiss_index, id_to_info,face_app)
+                            yield "data: ENROLLMENT_DONE\n\n"
+                            return  
+                
             count+=1
             ret, buffer = cv.imencode('.jpg', current_frame)
             frame = buffer.tobytes()
@@ -130,14 +133,18 @@ def add_new_user(name,ci,group, image,faiss_index,id_to_info,face_app):
 
 def capture_and_recognize(model, scale=0.5, faiss_index=None, id_to_info=None,face_app=None,idd=None):
     cap = cv.VideoCapture(0,cv.CAP_DSHOW)
-    cap.set(cv.CAP_PROP_FPS, 15)  
+    cap.set(cv.CAP_PROP_FPS, 25)  
     cap.set(cv.CAP_PROP_FRAME_WIDTH, 640)  
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
+    LEFT_EYE = [33, 160, 158, 133, 153, 144]    # [left corner, top-mid1, top-mid2, right corner, bottom-mid1, bottom-mid2]
+    RIGHT_EYE = [362, 385, 387, 263, 373, 380]
+    NOSE_TIP = 1
     if not cap.isOpened():
         print("Cannot access camera")
         yield "data: ERROR: Cannot access camera\n\n"
         return
     count=0
+    countt=0
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -161,12 +168,20 @@ def capture_and_recognize(model, scale=0.5, faiss_index=None, id_to_info=None,fa
                     cv.rectangle(current_frame, (x1, y1), (x2, y2), (129, 200, 500), 2)
                     cv.putText(current_frame, f"Face {conf:.2f}", (x1, y1 - 10),
                             cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-                    if conf>0.8 and count>35:
-                        face_image = current_frame[y1:y2, x1:x2]
-                        print("recognize_face")
-                        yield recognize_face(face_image,faiss_index,id_to_info,idd,face_app)
+                    cv.putText(current_frame,"Recognising the face Stay Still..",((x1-20),y2+15),cv.FONT_HERSHEY_SIMPLEX,0.6,(191,95,0),2)
+                    liveness=detect_liveness(current_frame[y1:y2, x1:x2])
+                    if not liveness:
+                        countt+=1
+                    else:
+                        countt-=1
+                        if conf>0.8 and count>50 :
+                            face_image = current_frame[y1:y2, x1:x2]
+                            print("recognize_face")
+                            yield recognize_face(face_image,faiss_index,id_to_info,idd,face_app)
                         
-                
+                    if countt>14:
+                        print("Spoofing")
+                        yield "data: Spoofing_detected\n\n"
             count+=1
             ret, buffer = cv.imencode('.jpg', current_frame)
             frame = buffer.tobytes()

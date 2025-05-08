@@ -29,6 +29,11 @@
                         window.location.href = "{{ url_for('registration') }}"; 
                         return;
                     }
+                    if(text.includes("Spoofing_detected")){
+                        alert("Enrollment Failed, You have been reported to the IT department...");
+                        window.location.href = "{{ url_for('registration') }}"; 
+                        return;
+                    }
 
                     read(); // Continue reading
                 }).catch(err => {

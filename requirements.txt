@@ -1,6 +1,6 @@
 flask
 opencv-python
-
+mediapipe
 insightface 
 onnxruntime 
 faiss-cpu
