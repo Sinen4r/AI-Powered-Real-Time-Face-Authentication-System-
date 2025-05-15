@@ -22,7 +22,7 @@ model = YOLO("model.pt")
 EYE_AR_THRESH = 0.3
 
 mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1)
+face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1)
 mp_drawing = mp.solutions.drawing_utils
 
 

@@ -4,7 +4,6 @@ import numpy as np
 from scipy.spatial import distance as dist
 
 # Eye aspect ratio (EAR) threshold for blink detection
-EYE_AR_THRESH = 0.26
 
 # Initialize MediaPipe Face Mesh
 mp_face_mesh = mp.solutions.face_mesh
@@ -25,6 +24,7 @@ RIGHT_EYE = [362, 385, 387, 263, 373, 380]
 NOSE_TIP = 1
 
 def detect_liveness(image):
+    EYE_AR_THRESH = 0.26
     h, w, _ = image.shape
     rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = face_mesh.process(rgb_image)

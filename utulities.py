@@ -171,7 +171,7 @@ def capture_and_recognize(model, scale=0.5, faiss_index=None, id_to_info=None,fa
                     cv.putText(current_frame,"Recognising the face Stay Still..",((x1-20),y2+15),cv.FONT_HERSHEY_SIMPLEX,0.6,(191,95,0),2)
                     liveness=detect_liveness(current_frame[y1:y2, x1:x2])
                     if not liveness:
-                        countt+=1
+                        countt+=2
                     else:
                         countt-=1
                         if conf>0.8 and count>50 :
@@ -179,7 +179,7 @@ def capture_and_recognize(model, scale=0.5, faiss_index=None, id_to_info=None,fa
                             print("recognize_face")
                             yield recognize_face(face_image,faiss_index,id_to_info,idd,face_app)
                         
-                    if countt>14:
+                    if countt>10:
                         print("Spoofing")
                         yield "data: Spoofing_detected\n\n"
             count+=1

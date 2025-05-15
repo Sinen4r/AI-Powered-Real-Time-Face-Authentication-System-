@@ -10,3 +10,8 @@ config.json
 
 # Ignore all __pycache__ folders
 __pycache__/
+face.png
+static/images/image-1.png
+static/images/image-2.png
+static/images/image4.png
+static/images/img.png
